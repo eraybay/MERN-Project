@@ -3,7 +3,7 @@ import "./MainScreenTemplate.css";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
-const MainScreenTemplate = ({ title, children }) => {
+const MainScreenTemplate = ({ title, subtitle, children }) => {
   return (
     <div className="mainback">
       <Container>
@@ -12,6 +12,7 @@ const MainScreenTemplate = ({ title, children }) => {
             {title && (
               <>
                 <h1 className="title"> {title}</h1>
+                <h6 className="subtitle"> {subtitle}</h6>
                 <hr />
               </>
             )}

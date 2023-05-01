@@ -1,24 +1,22 @@
 const express = require("express");
 const app = express();
-const events = require("./data/event");
-require('dotenv').config()
+const events = require("../frontend/src/event");
+require("dotenv").config();
+const cors = require("cors");
+const connectDB = require("./config/db");
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5000;
 
+app.use(cors());
 
-app.listen(port,console.log("Listening on port " + port ));
+connectDB();
+
+app.listen(port, console.log("Listening on port " + port));
 
 app.get("/", function (req, res) {
-        res.send("Hello World");
+  res.send("Hello World");
 });
 
 app.get("/events", function (req, res) {
-    res.send(events);
+  res.json(events);
 });
-
-app.get("/events/:id" , (req, res) => {
-    const specificEvent = events.find((index) => 
-        index._id === req.params.id);
-    res.send(specificEvent.title);
-}) 
-
