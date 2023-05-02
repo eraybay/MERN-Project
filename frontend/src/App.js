@@ -4,6 +4,8 @@ import Footer from "./components/Footer/Footer";
 import LandingPage from "./ScreenTypes/LandingPage/LandingPage";
 import MyEventsAdmin from "./ScreenTypes/MyEventsAdmin/MyEventsAdmin";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LoginScreen from "./ScreenTypes/LoginScreen/LoginScreen";
+import RegisterScreen from "./ScreenTypes/RegisterScreen/RegisterScreen";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         rendered based on the input.
       */}
           <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/register" element={<RegisterScreen />} />
           <Route path="/events" element={<MyEventsAdmin />} />
         </Routes>
       </main>
