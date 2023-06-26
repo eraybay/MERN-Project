@@ -6,36 +6,78 @@ import Card from "react-bootstrap/Card";
 import "./MyEventsAdmin.css";
 import Badge from "react-bootstrap/Badge";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { listEvents } from "../../actions/eventActions";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import ErrorMessage from "../../components/ErrorMessage";
+import Loading from "../../components/Loading";
+import ConfirmMessage from "../../components/ConfirmMessage";
+import { deleteEvent } from "../../actions/eventActions";
 
 const MyEventsAdmin = () => {
-  const [events, setEvents] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const eventList = useSelector((state) => state.eventList);
+  const { loading, error, events } = eventList;
+
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+
+  const eventCreate = useSelector((state) => state.eventCreate);
+  const { created } = eventCreate;
+
+  const eventUpdate = useSelector((state) => state.eventUpdate);
+  const { updated } = eventUpdate;
+
+  const userUpdate = useSelector((state) => state.userUpdate);
+  const { success } = userUpdate;
+
+  const eventDelete = useSelector((state) => state.eventDelete);
+  const {
+    loading: loadingDelete,
+    error: errorDelete,
+    deleted,
+    deletedMessage,
+  } = eventDelete;
 
   const deleteHandler = (id) => {
     if (window.confirm("Are you sure to delete?")) {
+      dispatch(deleteEvent(id));
     }
   };
 
-  const fetchEvents = async () => {
-    const { data } = await axios.get("http://localhost:5000/events");
-
-    setEvents(data);
-    console.log("MyEventsAdmin rendered");
-  };
-
-  console.log(events);
-
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    dispatch(listEvents());
+    //if ((userInfo = null)) {
+    //  navigate("/");
+    //}
+    if (created) {
+      //çalışmıo
+      navigate("/events");
+    }
+  }, [dispatch, created, navigate, updated, userInfo, deleted, success]);
+
   return (
     <div>
-      <MainScreenTemplate title="Events Published" subtitle="by Eray Baydemir">
+      <MainScreenTemplate
+        title="Events Published"
+        subtitle={"by " + userInfo.name}
+      >
         <Button className="create-button" variant="primary" size="lg">
-          <Link to="/create event">Create an Event</Link>
+          <Link to="/create-event">Create an Event</Link>
         </Button>
         {/*rendering the events files to the event poage using map function of js*/}
-        {events.map((event) => (
+        {loading && <Loading />}
+        {error && <ErrorMessage variant="danger"> {error} </ErrorMessage>}
+        {loadingDelete && <Loading />}
+        {errorDelete && (
+          <ErrorMessage variant="danger"> {errorDelete} </ErrorMessage>
+        )}
+        {deletedMessage && (
+          <ConfirmMessage variant="danger"> {deletedMessage} </ConfirmMessage>
+        )}
+        {events?.map((event) => (
           <Card
             className="mt-4 mb-2 mr-3"
             style={{ width: "22rem", display: "inline-block" }}
@@ -48,7 +90,7 @@ const MyEventsAdmin = () => {
                   alignSelf: "center",
                 }}
               >
-                {event.title}
+                {event.eventName}
               </Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
                 Created Event
@@ -57,7 +99,7 @@ const MyEventsAdmin = () => {
                 <Badge>{event.category}</Badge>
               </h6>
 
-              <p className="eventText">{event.content}</p>
+              <p className="eventText">{event.description}</p>
 
               <Link
                 className="mb-3"
@@ -67,7 +109,7 @@ const MyEventsAdmin = () => {
               </Link>
 
               <Button className="mr-4">
-                <Link to={"/event-edit/" + event._id}>Edit the Event</Link>
+                <Link to={"/event-preview/" + event._id}>Edit the Event</Link>
               </Button>
 
               <Button variant="danger" onClick={() => deleteHandler(event._id)}>
@@ -75,7 +117,7 @@ const MyEventsAdmin = () => {
               </Button>
 
               <footer className="date-recorder text-muted">
-                Created on - date
+                Created at: {event.createdAt.substring(0, 10)}
               </footer>
             </Card.Body>
           </Card>

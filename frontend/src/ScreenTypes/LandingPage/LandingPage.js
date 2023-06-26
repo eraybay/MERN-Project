@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   {
@@ -24,16 +25,20 @@ const LandingPage = () => {
               <h1 className="title">Welcome to ConnectHUB</h1>
               <p className="subtitle">A place to discover your potential</p>
               <div className="button-container">
-                <Button className="landingbutton" variant="primary" size="lg">
-                  Sign Up
-                </Button>
-                <Button
-                  className="landingbutton"
-                  variant="outline-primary"
-                  size="lg"
-                >
-                  Log In
-                </Button>
+                <Link to="/register">
+                  <Button className="landingbutton" variant="primary" size="lg">
+                    Sign Up
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button
+                    className="landingbutton"
+                    variant="outline-primary"
+                    size="lg"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

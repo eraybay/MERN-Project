@@ -27,6 +27,26 @@ const userSchema = mongoose.Schema(
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
+    adress_line_1: {
+      type: String,
+      required: true,
+    },
+    adress_line_2: {
+      type: String,
+      required: true,
+    },
+    district: {
+      type: String,
+      required: true,
+    },
+    province: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

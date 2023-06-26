@@ -1,49 +1,41 @@
-import React from "react";
-import MainScreenTemplate from "../../components/MainScreenTemplate";
+import React, { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useState } from "react";
-import axios from "axios";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
+import MainScreenTemplate from "../../components/MainScreenTemplate";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../actions/loginActions";
+//import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  //loading, error, and userInfo variables can now be used inside MyComponent, and the component will re-render whenever these pieces of state change in the Redux store. This is a common pattern for accessing data from the Redux store inside a React component.
+  const userLogin = useSelector((state) => state.userLogin);
+  const { loading, error, userInfo } = userLogin;
+  //const history = useHistory();
+  const navigate = useNavigate();
+  //if there is a userInfo present in the local Storgae of the browser, it will direct to user to events by pushing the history stack
+  useEffect(() => {
+    if (userInfo) {
+      //history.push("/events");
+      navigate("/events");
+    }
+  }, [navigate, userInfo]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
 
-      setLoading(true);
-
-      const { data } = await axios.post(
-        "/api/users/login",
-        {
-          email,
-          password,
-        },
-        config
-      );
-      //using stringfy because json cannot hold object data
-      console.log(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setLoading(false);
-    } catch (error) {
-      setError(error.response.data.message);
-      setLoading(false);
-    }
+    dispatch(login(email, password));
   };
 
   return (
     <MainScreenTemplate title="Login Page">
+      {/*if loading varibale is true, loading component will be rendered*/}
       {loading && <Loading />}
       {error && <ErrorMessage variant="danger"> {error} </ErrorMessage>}
       <Form className="ml-2" onSubmit={submitHandler}>
@@ -56,9 +48,6 @@ const LoginScreen = () => {
             //setting the mail to the useState variable
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Form.Text className="text-muted">
-            We'll never share your email with anyone else.
-          </Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicPassword">
