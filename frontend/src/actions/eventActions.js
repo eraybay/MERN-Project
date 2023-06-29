@@ -11,26 +11,48 @@ import {
   EVENT_DELETE_FAIL,
   EVENT_DELETE_REQUEST,
   EVENT_DELETE_SUCCESS,
+  EVENT_USERLIST_REQUEST,
+  EVENT_USERLIST_SUCCESS,
+  EVENT_USERLIST_FAIL,
+  EVENT_ENROLL_REQUEST,
+  EVENT_ENROLL_SUCCESS,
+  EVENT_ENROLL_FAIL,
 } from "../constants/eventConstants";
 import axios from "axios";
 
 export const createEvent =
-  (eventName, description, ageRange, deadline, category) =>
+  (
+    eventName,
+    description,
+    ageRange,
+    deadline,
+    category,
+    ageRangeFirstInt,
+    ageRangeSecondInt
+  ) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: EVENT_CREATE_REQUEST });
       const {
-        userLogin: { userInfo },
+        organizerLogin: { organizerInfo },
       } = getState();
       const config = {
         headers: {
           "Content-type": "application/json",
-          Authorization: "Bearer " + userInfo.token,
+          Authorization: "Bearer " + organizerInfo.token,
         },
       };
       const { data } = await axios.post(
         "/api/events/create",
-        { eventName, description, ageRange, deadline, category },
+        {
+          eventName,
+          description,
+          ageRange,
+          deadline,
+          category,
+          ageRangeFirstInt,
+          ageRangeSecondInt,
+        },
         config
       );
       dispatch({
@@ -50,9 +72,9 @@ export const createEvent =
     }
   };
 
-export const listEvents = () => async (dispatch, getState) => {
+export const listEventsUser = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: EVENT_LIST_REQUEST });
+    dispatch({ type: EVENT_USERLIST_REQUEST });
 
     const {
       userLogin: { userInfo },
@@ -64,7 +86,40 @@ export const listEvents = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get("api/events", config);
+    //const { data } = await axios.get("/api/events/" + id + "/enroll", config);
+    const { data } = await axios.get("/api/events/events-users", config);
+
+    dispatch({
+      type: EVENT_USERLIST_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+
+    dispatch({
+      type: EVENT_USERLIST_FAIL,
+      payload: message,
+    });
+  }
+};
+export const listEventsOrganizer = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: EVENT_LIST_REQUEST });
+
+    const {
+      organizerLogin: { organizerInfo },
+    } = getState();
+    //just like postman api requests we are sending a token request
+    const config = {
+      headers: {
+        Authorization: "Bearer " + organizerInfo.token,
+      },
+    };
+
+    const { data } = await axios.get("/api/events/events-organizer", config);
 
     dispatch({
       type: EVENT_LIST_SUCCESS,
@@ -82,7 +137,21 @@ export const listEvents = () => async (dispatch, getState) => {
     });
   }
 };
+export const listEventsWithoutAuth = () => async (dispatch) => {
+  try {
+    dispatch({ type: EVENT_LIST_REQUEST });
 
+    const { data } = await axios.get("/api/events/");
+
+    dispatch({ type: EVENT_LIST_SUCCESS, payload: data });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+    dispatch({ type: EVENT_LIST_FAIL, payload: message });
+  }
+};
 export const updateEvent =
   (id, eventName, description, ageRange, deadline, category) =>
   async (dispatch, getState) => {
@@ -90,13 +159,13 @@ export const updateEvent =
       dispatch({ type: EVENT_UPDATE_REQUEST });
 
       const {
-        userLogin: { userInfo },
+        organizerLogin: { organizerInfo },
       } = getState();
 
       const config = {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
+          "Content-type": "application/json",
+          Authorization: "Bearer " + organizerInfo.token,
         },
       };
       const { data } = await axios.put(
@@ -123,18 +192,17 @@ export const updateEvent =
       });
     }
   };
-
 export const deleteEvent = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: EVENT_DELETE_REQUEST });
 
     const {
-      userLogin: { userInfo },
+      organizerLogin: { organizerInfo },
     } = getState();
     //just like postman api requests we are sending a token request
     const config = {
       headers: {
-        Authorization: "Bearer " + userInfo.token,
+        Authorization: "Bearer " + organizerInfo.token,
       },
     };
 
@@ -155,6 +223,42 @@ export const deleteEvent = (id) => async (dispatch, getState) => {
 
     dispatch({
       type: EVENT_DELETE_FAIL,
+      payload: message,
+    });
+  }
+};
+export const enrollEvent = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: EVENT_ENROLL_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: "Bearer " + userInfo.token,
+      },
+    };
+    const { data } = await axios.post(
+      "/api/events/" + id + "/enroll",
+      null,
+      config
+    );
+    dispatch({
+      type: EVENT_ENROLL_SUCCESS,
+      payload: "You have succesffuly enrolled to the event",
+    });
+  } catch (error) {
+    console.log(error.response);
+
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+
+    dispatch({
+      type: EVENT_ENROLL_FAIL,
       payload: message,
     });
   }

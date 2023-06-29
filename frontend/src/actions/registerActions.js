@@ -3,14 +3,12 @@ import {
   USER_REGISTER_FAIL,
   USER_REGISTER_MESSAGE,
   USER_REGISTER_REQUEST,
-  USER_REGISTER_SUCCESS,
 } from "../constants/userConstants";
 import axios from "axios";
 
 export const register =
   (
     name,
-    pic,
     email,
     password,
     adress_line_1,
@@ -18,7 +16,8 @@ export const register =
     district,
     province,
     description,
-    confirmpassword
+    confirmpassword,
+    age
   ) =>
   async (dispatch) => {
     try {
@@ -29,10 +28,9 @@ export const register =
         },
       };
       const { data } = await axios.post(
-        "/api/users/",
+        "/api/users/register",
         {
           name,
-          pic,
           email,
           password,
           adress_line_1,
@@ -41,6 +39,7 @@ export const register =
           province,
           description,
           confirmpassword,
+          age,
         },
         config
       );

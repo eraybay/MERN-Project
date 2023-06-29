@@ -13,3 +13,23 @@
 .date-recorder {
     margin-top: 10px;
 }
+.hrr{
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 49%;
+    text-align: left;
+    display: block;
+}
+.cont{
+    display: flex;
+    flex-wrap: wrap;
+    width: 30%;
+    display: inline-block;
+}
+
+.blocksss{
+    text-align: center;
+    font-size: 15px;
+    font-weight:600;
+}

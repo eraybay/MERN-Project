@@ -9,7 +9,7 @@ import {
 } from "../constants/userConstants";
 import axios from "axios";
 
-export const login = (email, password) => async (dispatch) => {
+export const loginUser = (email, password) => async (dispatch) => {
   try {
     dispatch({ type: USER_LOGIN_REQUEST });
     const config = {
@@ -38,7 +38,7 @@ export const login = (email, password) => async (dispatch) => {
     });
   }
 };
-export const logout = () => async (dispatch) => {
+export const logoutUser = () => async (dispatch) => {
   localStorage.removeItem("userInfo");
   dispatch({ type: USER_LOGOUT });
 };

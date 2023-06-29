@@ -1,0 +1,12 @@
+.aa {
+    display: flex;
+    justify-content: center;
+    /* Centers items on the line (left/right). */
+    align-items: center;
+    /* Centers items on the cross-axis (top/bottom). */
+    height: 30vh;
+    /* Use full viewport height. */
+    transform: translateY(-10%);
+    /* Shifts container 10% up. */
+    gap: 80px;
+}

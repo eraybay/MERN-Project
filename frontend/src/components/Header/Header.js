@@ -7,7 +7,8 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../actions/loginActions";
+import { logoutUser } from "../../actions/loginActions";
+import { logoutOrganizer } from "../../actions/organizerActions";
 
 // Link is used to provide a faster transitions between pages without ever refreshing the main page*/
 function Header() {
@@ -16,9 +17,15 @@ function Header() {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
+  const organizerLogin = useSelector((state) => state.organizerLogin);
+  const { organizerInfo } = organizerLogin;
+
   const LogOut = () => {
-    dispatch(logout());
-    navigate("/");
+    userInfo
+      ? dispatch(logoutUser())
+      : organizerInfo
+      ? dispatch(logoutOrganizer())
+      : navigate("/");
   };
   return (
     <Navbar bg="primary" expand="lg" variant="dark">
@@ -30,42 +37,47 @@ function Header() {
         >
           <Link to="/">ConnectHUB</Link>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll">
-          <Form className="d-flex m-auto">
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-            />
-            <Button variant="outline-success mx-3">Search</Button>
-          </Form>
-          {userInfo ? (
-            <Nav
-              className="me-auto my-2 my-lg-0"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
+        {userInfo || organizerInfo ? (
+          <Nav
+            className="me-auto my-2 my-lg-0"
+            style={{ maxHeight: "100px" }}
+            navbarScroll
+          >
+            <Nav.Link>
+              <Link
+                to={userInfo ? "/user-events" : organizerInfo ? "/events" : ""}
+              >
+                {userInfo
+                  ? "Event List"
+                  : organizerInfo
+                  ? "Events Published"
+                  : ""}
+              </Link>
+            </Nav.Link>
+            <NavDropdown
+              title={
+                userInfo
+                  ? userInfo.name
+                  : organizerInfo
+                  ? organizerInfo.name
+                  : ""
+              }
+              id="navbarScrollingDropdown"
             >
-              <Nav.Link>
-                <Link to="/events">My Events</Link>
-              </Nav.Link>
-              <NavDropdown title={userInfo.name} id="navbarScrollingDropdown">
-                <NavDropdown.Item>
-                  <Link to="/profile">My Profile</Link>
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item onClick={LogOut}>Log Out</NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
-          ) : (
-            <Nav>
-              <Nav.Link>
-                <Link to="/login">Login</Link>
-              </Nav.Link>
-            </Nav>
-          )}
-        </Navbar.Collapse>
+              <NavDropdown.Item>
+                <Link to="/profile">My Profile</Link>
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={LogOut}>Log Out</NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        ) : (
+          <Nav>
+            <Nav.Link>
+              <Link to="/login">Login</Link>
+            </Nav.Link>
+          </Nav>
+        )}
       </Container>
     </Navbar>
   );

@@ -8,13 +8,13 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password,
-    pic,
     adress_line_1,
     adress_line_2,
     district,
     province,
     description,
     confirmpassword,
+    age,
   } = req.body;
   const isValidEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -26,6 +26,11 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!isValidEmail(email)) {
     return res.status(400).json({ message: "Email format is wrong" });
   }
+  if (age < 7 || age > 18) {
+    return res
+      .status(400)
+      .json({ message: "Please enter a valid age between 7 and 18" });
+  }
   //checking if the emial has been registered before
   const userExists = await User.findOne({ email });
   //if there is, throw 400 error code
@@ -36,7 +41,6 @@ const registerUser = asyncHandler(async (req, res) => {
   //creat the user with given variables
   const user = await User.create({
     name,
-    pic,
     email,
     password,
     adress_line_1,
@@ -44,6 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
     district,
     province,
     description,
+    age,
   });
   //if created user is completed, throw the 201 succesful status code and return the variables except password because password
   //will be encrypted
@@ -53,13 +58,13 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      pic: user.pic,
       adress_line_1: user.adress_line_1,
       adress_line_2: user.adress_line_2,
       district: user.district,
       province: user.province,
       description: user.description,
       token: generateToken(user._id),
+      age: user.age,
     });
   } else {
     res.status(400);
@@ -67,7 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-//used for login of the user
+//used for login of the clients
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -77,7 +82,6 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      pic: user.pic,
       adress_line_1: user.adress_line_1,
       adress_line_2: user.adress_line_2,
       district: user.district,

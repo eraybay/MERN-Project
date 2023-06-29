@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
-const User = require("../models/userModel");
+const Organizer = require("../models/organizerModel");
 require("dotenv").config();
 
-const protect = asyncHandler(async (req, res, next) => {
+const protectOrganizer = asyncHandler(async (req, res, next) => {
   let token;
   if (
     req.headers.authorization &&
@@ -16,7 +16,8 @@ const protect = asyncHandler(async (req, res, next) => {
       //This line is verifying the JWT. JWTs are cryptographically signed to ensure their integrity. When you call jwt.verify, it checks that the JWT was signed with the secret key. If the token was manipulated or signed with a different key, jwt.verify will throw an error. If the JWT is valid, jwt.verify returns the payload of the JWT, which is then stored in the decoded variable. The payload often contains information about the user who owns the JWT.
       const decoded = jwt.verify(token, process.env.JWT_SECRETTT);
       //This line is using the id field from the JWT payload to fetch the user from your database. It then attaches the user to the req object, but it tells Mongoose not to include the password field (select("-password")). This means that req.user will contain the user object for the rest of your middleware functions to use, but it won't contain the user's password.
-      req.user = await User.findById(decoded.id).select("-password");
+      req.organizer = await Organizer.findById(decoded.id).select("-password");
+
       //if everything is ok, continue to process the method.
       next();
     } catch (error) {
@@ -31,4 +32,4 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = protect;
+module.exports = protectOrganizer;

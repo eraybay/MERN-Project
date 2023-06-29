@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { register } from "../../actions/registerActions";
 
-const RegisterScreen = () => {
+const UserRegisterScreen = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,10 +19,7 @@ const RegisterScreen = () => {
   const [adress_line_1, setAdress_line_1] = useState("");
   const [adress_line_2, setAdress_line_2] = useState("");
   const [description, setDescription] = useState("");
-  const [pic, setPic] = useState(
-    "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
-  );
-  const [picmessage, setPicMessage] = useState(null);
+  const [age, setAge] = useState(null);
   const [confirmpassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -33,6 +30,7 @@ const RegisterScreen = () => {
   const { userInfo } = userLogin;
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (userInfo) {
@@ -49,7 +47,6 @@ const RegisterScreen = () => {
     dispatch(
       register(
         name,
-        pic,
         email,
         password,
         adress_line_1,
@@ -57,7 +54,8 @@ const RegisterScreen = () => {
         district,
         province,
         description,
-        confirmpassword
+        confirmpassword,
+        age
       )
     );
   };
@@ -113,10 +111,26 @@ const RegisterScreen = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Group>
-        {picmessage && (
-          <ErrorMessage variant="danger"> {picmessage} </ErrorMessage>
-        )}
-
+        <Form.Group>
+          <Form.Label className="block">Age</Form.Label>
+          <Form.Select
+            className="mb-3 pe-6"
+            onChange={(e) => setAge(e.target.value)}
+          >
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+          </Form.Select>
+        </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control
@@ -187,4 +201,4 @@ const RegisterScreen = () => {
     </MainScreenTemplate>
   );
 };
-export default RegisterScreen;
+export default UserRegisterScreen;

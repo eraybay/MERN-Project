@@ -11,7 +11,13 @@ import {
   eventReducer,
   updateEventReducer,
   deleteEventReducer,
+  eventUserReducer,
+  enrollEvents,
 } from "./reducers/eventReducers";
+import {
+  organizerLoginReducer,
+  organizerRegisterReducer,
+} from "./reducers/organizerReducers";
 
 const reducers = combineReducers({
   //all of the reducers will go here
@@ -22,14 +28,22 @@ const reducers = combineReducers({
   eventCreate: createEventReducer,
   eventUpdate: updateEventReducer,
   eventDelete: deleteEventReducer,
+  organizerRegister: organizerRegisterReducer,
+  organizerLogin: organizerLoginReducer,
+  eventUserList: eventUserReducer,
+  eventEnroll: enrollEvents,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;
+const organizerInfoFromStorage = localStorage.getItem("organizerInfo")
+  ? JSON.parse(localStorage.getItem("organizerInfo"))
+  : null;
 
 const initialState = {
   userLogin: { userInfo: userInfoFromStorage },
+  organizerLogin: { organizerInfo: organizerInfoFromStorage },
 };
 
 const middleware = [thunk];

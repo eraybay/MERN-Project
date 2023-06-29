@@ -1,33 +1,91 @@
 const Event = require("../models/eventModel");
 const asyncHandler = require("express-async-handler");
+const currentDate = new Date();
 
-const getEvents = asyncHandler(async (req, res) => {
-  const events = await Event.find({ user: req.user._id });
+const getEventsUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const userEvents = await Event.find({ enrolledUsers: userId });
+  res.json(userEvents);
+});
+const getEventsOrganizer = asyncHandler(async (req, res) => {
+  const events = await Event.find({ organizer: req.organizer._id });
+  res.json(events);
+});
+const getEventsWithoutAuth = asyncHandler(async (req, res) => {
+  const events = await Event.find();
   res.json(events);
 });
 
 const createEvent = asyncHandler(async (req, res) => {
-  const { eventName, description, ageRange, deadline, category } = req.body;
+  const {
+    eventName,
+    description,
+    ageRangeFirstInt,
+    ageRangeSecondInt,
+    deadline,
+    category,
+  } = req.body;
 
-  if (!eventName || !description || !ageRange || !deadline || !category) {
+  if (
+    !eventName ||
+    !description ||
+    !ageRangeFirstInt ||
+    !ageRangeSecondInt ||
+    !deadline ||
+    !category ||
+    !(
+      category.social_aid_event ||
+      category.academic_event ||
+      category.school_based_tournament ||
+      category.sport_competition
+    )
+  ) {
     res.status(400);
-    throw new Error("Please fill the all fields");
-  } else {
-    const event = new Event({
-      user: req.user._id,
-      eventName,
-      description,
-      ageRange,
-      deadline,
-      category,
-    });
-
-    const createdEvent = await event.save();
-
-    res.status(201).json(createdEvent);
+    throw new Error("Please fill all the fields");
   }
+  if (ageRangeFirstInt >= ageRangeSecondInt) {
+    res.status(400);
+    throw new Error("Please set out a proper age range");
+  }
+  if (new Date(deadline) <= currentDate) {
+    res.status(400);
+    throw new Error("Deadline must be in the future");
+  }
+
+  const event = new Event({
+    organizer: req.organizer._id,
+    eventName,
+    description,
+    ageRangeFirstInt,
+    ageRangeSecondInt,
+    deadline,
+    category,
+    enrolledUsers: [],
+  });
+
+  const createdEvent = await event.save();
+
+  res.status(201).json(createdEvent);
 });
 
+const enrollUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const eventId = req.params.id;
+
+  const event = await Event.findById(eventId);
+  if (!eventId) {
+    res.status(404);
+    throw new Error("Event couldn't be found");
+  }
+  if (event.enrolledUsers.includes(userId)) {
+    res.status(405);
+    throw new Error("You have already enrolled into this event");
+  }
+
+  event.enrolledUsers.push(userId);
+  await event.save();
+  res.json({ message: "Enrollment successful" });
+});
 const getEventById = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id);
   try {
@@ -64,7 +122,7 @@ const deleteEvent = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id);
 
   if (event) {
-    if (event.user.toString() !== req.user._id.toString()) {
+    if (event.organizer.toString() !== req.organizer._id.toString()) {
       res.status(401);
       throw new Error("You cannot perform this action");
     }
@@ -77,9 +135,12 @@ const deleteEvent = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getEvents,
+  getEventsUser,
   createEvent,
   getEventById,
   UpdateEvent,
   deleteEvent,
+  getEventsWithoutAuth,
+  getEventsOrganizer,
+  enrollUser,
 };

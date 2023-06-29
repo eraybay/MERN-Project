@@ -6,6 +6,8 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const organizerRoutes = require("./routes/organizerRoutes");
+
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
 
 const port = process.env.PORT || 5000;
@@ -25,6 +27,7 @@ app.listen(port, console.log("Listening on port " + port));
 //using express routes
 app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/organizer", organizerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
